@@ -1,14 +1,24 @@
 const express = require('express')
 const app = express()
 const port = 3000
-
+var fs = require('fs');
+var template = require('./lib/template.js');
 
 /*app.get : route, routing 하고있음
   if(pathname==='/'){} 와 같은 말
 */
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+app.get('/', (request, response) => {
+  fs.readdir('./data', function (error, filelist) {
+    var title = 'Welcome';
+    var description = 'Hello, Node.js';
+    var list = template.list(filelist);
+    var html = template.HTML(title, list,
+      `<h2>${title}</h2>${description}`,
+      `<a href="/create">create</a>`
+    );
+    response.send(html);
+  });
+});
 
 /* app.get('/', function (req, res) {
    return res.send('Hello World')
