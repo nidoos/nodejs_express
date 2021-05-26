@@ -7,8 +7,10 @@ var fs = require('fs');
 var template = require('./lib/template.js');
 var path = require('path');
 var qs = require('querystring');
+var compression = require('compression');
 
 app.use(bodyParser.urlencoded({ extended: false })); //bodyparser가 실행되면서 결과로 미들웨어가 들어오게된다. bodyparser가 만들어내는 미들웨어를 표현하는 표현식.
+app.use(compression());
 
 /*app.get : route, routing 하고있음
   if(pathname==='/'){} 와 같은 말
