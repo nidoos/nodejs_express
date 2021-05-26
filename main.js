@@ -1,11 +1,14 @@
 const express = require('express')
 const app = express()
 const port = 3000
+var sanitizeHtml = require('sanitize-html');
+var bodyParser = require('body-parser');
 var fs = require('fs');
 var template = require('./lib/template.js');
 var path = require('path');
-var sanitizeHtml = require('sanitize-html');
 var qs = require('querystring');
+
+app.use(bodyParser.urlencoded({ extended: false })); //bodyparser가 실행되면서 결과로 미들웨어가 들어오게된다. bodyparser가 만들어내는 미들웨어를 표현하는 표현식.
 
 /*app.get : route, routing 하고있음
   if(pathname==='/'){} 와 같은 말
@@ -67,20 +70,32 @@ app.get('/create', (request, response) => {
 });
 
 app.post('/create_process', (request, response) => {
-  var body = '';
-  request.on('data', (data) => {
-    body = body + data;
-  });
-  request.on('end', () => {
-    var post = qs.parse(body);
-    var title = post.title;
-    var description = post.description;
-    fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
-      response.writeHead(302, { Location: `/?id=${title}` });
-      response.end();
-    })
-  });
-})
+  /*
+   var body = '';
+   request.on('data', (data) => {
+     body = body + data;
+   });
+   request.on('end', () => {
+     var post = qs.parse(body);
+     var title = post.title;
+     var description = post.description;
+     fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
+       response.writeHead(302, { Location: `/?id=${title}` });
+       response.end();
+     })
+   });
+   */
+
+  //bodyParser 사용
+  var post = request.body;
+  var title = post.title;
+  var description = post.description;
+  fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
+    response.writeHead(302, { Location: `/?id=${title}` });
+    response.end();
+  })
+});
+
 
 app.get('/update/:pageId', (request, response) => {
   fs.readdir('./data', (error, filelist) => {
@@ -110,36 +125,40 @@ app.get('/update/:pageId', (request, response) => {
 });
 
 app.post('/update_process', (request, response) => {
-  var body = '';
-  request.on('data', (data) => {
-    body = body + data;
-  });
-  request.on('end', () => {
-    var post = qs.parse(body);
-    var id = post.id;
-    var title = post.title;
-    var description = post.description;
-    fs.rename(`data/${id}`, `data/${title}`, (error) => {
-      fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
-        response.redirect(`/?id=${title}`);
-      })
+  /*
+    var body = '';
+    request.on('data', (data) => {
+      body = body + data;
     });
+    request.on('end', () => {
+    */
+  //bodyParser 사용
+  var post = request.body;
+  var id = post.id;
+  var title = post.title;
+  var description = post.description;
+  fs.rename(`data/${id}`, `data/${title}`, (error) => {
+    fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
+      response.redirect(`/?id=${title}`);
+    })
   });
 });
 
 app.post('/delete_process', (request, response) => {
-  var body = '';
-  request.on('data', (data) => {
-    body = body + data;
-  });
-  request.on('end', () => {
-    var post = qs.parse(body);
-    var id = post.id;
-    var filteredId = path.parse(id).base;
-    fs.unlink(`data/${filteredId}`, (error) => {
-      response.redirect('/');
-    })
-  });
+  /*
+    var body = '';
+    request.on('data', (data) => {
+      body = body + data;
+    });
+    request.on('end', () => {
+    */
+  var post = request.body;
+  var id = post.id;
+  var filteredId = path.parse(id).base;
+  fs.unlink(`data/${filteredId}`, (error) => {
+    response.redirect('/');
+  })
+
 });
 
 
