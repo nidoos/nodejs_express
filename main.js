@@ -4,14 +4,26 @@ const port = 3000
 var bodyParser = require('body-parser');
 var fs = require('fs');
 var compression = require('compression');
+var helmet = require('helmet');
+var session = require('express-session')
+var FileStore = require('session-file-store')(session)
+
 var indexRouter = require('./routes/index');
 var topicRouter = require('./routes/topic');
-var helmet = require('helmet');
+var authRouter = require('./routes/auth');
 
 app.use(helmet());
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: false })); //bodyparser가 실행되면서 결과로 미들웨어가 들어오게된다. bodyparser가 만들어내는 미들웨어를 표현하는 표현식.
 app.use(compression());
+
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  store: new FileStore()
+}))
+
 app.get('*', (request, response, next) => {
   fs.readdir('./data', (error, filelist) => {
     request.list = filelist;
@@ -22,6 +34,7 @@ app.get('*', (request, response, next) => {
 // /topic 으로 시작하는 주소들에게 topicRouter미들웨어를 적용
 app.use('/', indexRouter);
 app.use('/topic', topicRouter);
+app.use('/auth', authRouter);
 
 app.use((request, response, next) => {
   response.status(404).send('Sorry cant find that!');

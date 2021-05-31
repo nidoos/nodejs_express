@@ -4,36 +4,15 @@ var path = require('path');
 var fs = require('fs');
 var sanitizeHtml = require('sanitize-html');
 var template = require('../lib/template.js');
-
-router.get('/login', (request, response) => {
-    var title = 'Login';
-    var list = template.list(request.list);
-    var html = template.HTML(title, list,
-        `
-        <form action="/topic/login_process" method = "post">
-        <p><input type = "text" name = "email" placeholder = "email"></p>
-        <p><input type = "password" name = "password" placeholder = "password"></p>
-        <p><input type = "submit"></p>
-        </form>
-        `,
-        `<a href="/topic/create">create</a>`
-    );
-    response.send(html);
-});
-
-router.post('/login_process', (request, response) => {
-    var post = request.body;
-    if (post.email === '111@abc.com' && post.password === '111') {
-        response.cookie('email', `${post.email}`);
-        response.cookie('password', `${post.password}`);
-        response.cookie('nickname', 'egoing');
-        response.redirect('/');
-    } else {
-        response.send('Who?');
-    }
-});
+var auth = require('../lib/auth');
 
 router.get('/create', (request, response) => {
+    //  auth.nonLogin(request, response);
+
+    if (!auth.isOwner(request, response)) {
+        response.redirect('/');
+        return false;
+    }
     var title = 'WEB - create';
     var list = template.list(request.list);
     var html = template.HTML(title, list, `
@@ -46,12 +25,12 @@ router.get('/create', (request, response) => {
               <input type="submit">
             </p>
           </form>
-        `, '');
+        `, '', auth.statusUI(request, response));
     response.send(html);
 });
 
 router.post('/create_process', (request, response) => {
-    //bodyParser 사용
+    //auth.nonLogin(request, response);
     var post = request.body;
     var title = post.title;
     var description = post.description;
@@ -78,7 +57,8 @@ router.get('/update/:pageId', (request, response) => {
               </p>
             </form>
             `,
-            `<a href="/topic/create">create</a> <a href="/topic/update/${title}">update</a>`
+            `<a href="/topic/create">create</a> <a href="/topic/update/${title}">update</a>`,
+            auth.statusUI(request, response)
         );
         response.send(html);
     });
@@ -125,7 +105,8 @@ router.get('/:pageId', (request, response, next) => {
                   <form action="/topic/delete_process" method="post">
                     <input type="hidden" name="id" value="${sanitizedTitle}">
                     <input type="submit" value="delete">
-                  </form>`
+                  </form>`,
+                auth.statusUI(request, response)
             );
             response.send(html);
 
