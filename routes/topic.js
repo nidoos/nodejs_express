@@ -5,6 +5,34 @@ var fs = require('fs');
 var sanitizeHtml = require('sanitize-html');
 var template = require('../lib/template.js');
 
+router.get('/login', (request, response) => {
+    var title = 'Login';
+    var list = template.list(request.list);
+    var html = template.HTML(title, list,
+        `
+        <form action="/topic/login_process" method = "post">
+        <p><input type = "text" name = "email" placeholder = "email"></p>
+        <p><input type = "password" name = "password" placeholder = "password"></p>
+        <p><input type = "submit"></p>
+        </form>
+        `,
+        `<a href="/topic/create">create</a>`
+    );
+    response.send(html);
+});
+
+router.post('/login_process', (request, response) => {
+    var post = request.body;
+    if (post.email === '111@abc.com' && post.password === '111') {
+        response.cookie('email', `${post.email}`);
+        response.cookie('password', `${post.password}`);
+        response.cookie('nickname', 'egoing');
+        response.redirect('/');
+    } else {
+        response.send('Who?');
+    }
+});
+
 router.get('/create', (request, response) => {
     var title = 'WEB - create';
     var list = template.list(request.list);
