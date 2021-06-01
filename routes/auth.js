@@ -27,7 +27,7 @@ router.get('/login', (request, response) => {
     response.send(html);
 });
 
-router.post('/login_process', (request, response) => {
+/* router.post('/login_process', (request, response) => {
     var post = request.body;
     var email = post.email;
     var password = post.pwd;
@@ -43,7 +43,7 @@ router.post('/login_process', (request, response) => {
     } else {
         response.send('Who?');
     }
-});
+}); */
 
 router.get('/logout', (request, response) => {
     //session_destroy

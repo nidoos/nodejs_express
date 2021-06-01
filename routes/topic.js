@@ -7,7 +7,7 @@ var template = require('../lib/template.js');
 var auth = require('../lib/auth');
 
 router.get('/create', (request, response) => {
-    //  auth.nonLogin(request, response);
+    // auth.nonLogin(request, response);
 
     if (!auth.isOwner(request, response)) {
         response.redirect('/');
@@ -30,7 +30,10 @@ router.get('/create', (request, response) => {
 });
 
 router.post('/create_process', (request, response) => {
-    //auth.nonLogin(request, response);
+    if (!auth.isOwner(request, response)) {
+        response.redirect('/');
+        return false;
+    }
     var post = request.body;
     var title = post.title;
     var description = post.description;
@@ -40,6 +43,10 @@ router.post('/create_process', (request, response) => {
 });
 
 router.get('/update/:pageId', (request, response) => {
+    if (!auth.isOwner(request, response)) {
+        response.redirect('/');
+        return false;
+    }
     var filteredId = path.parse(request.params.pageId).base;
     fs.readFile(`data/${filteredId}`, 'utf8', (err, description) => {
         var title = request.params.pageId;
@@ -65,6 +72,10 @@ router.get('/update/:pageId', (request, response) => {
 });
 
 router.post('/update_process', (request, response) => {
+    if (!auth.isOwner(request, response)) {
+        response.redirect('/');
+        return false;
+    }
     //bodyParser 사용
     var post = request.body;
     var id = post.id;
@@ -78,6 +89,10 @@ router.post('/update_process', (request, response) => {
 });
 
 router.post('/delete_process', (request, response) => {
+    if (!auth.isOwner(request, response)) {
+        response.redirect('/');
+        return false;
+    }
     var post = request.body;
     var id = post.id;
     var filteredId = path.parse(id).base;

@@ -24,6 +24,39 @@ app.use(session({
   store: new FileStore()
 }))
 
+//passport : 세션을 내부적으로 사용하기 때문에 express 세션을 활성화시키는 코드 다음에 passport가 등장해야한다.
+var passport = require('passport')
+  , LocalStrategy = require('passport-local').Strategy;
+
+passport.use(new LocalStrategy(
+  {
+    usernameField: 'email',
+    passwordField: 'pwd'
+  },
+  function (username, password, done) {
+    console.log('LocalStrategy', username, password);
+    /* User.findOne({ username: username }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (!user.validPassword(password)) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+    }); */
+  }
+));
+
+app.post('/auth/login_process',
+  passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/auth/login'
+  }));
+
+
+
+
 app.get('*', (request, response, next) => {
   fs.readdir('./data', (error, filelist) => {
     request.list = filelist;
