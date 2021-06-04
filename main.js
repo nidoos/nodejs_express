@@ -31,9 +31,28 @@ var authData = {
 }
 
 //passport : 세션을 내부적으로 사용하기 때문에 express 세션을 활성화시키는 코드 다음에 passport가 등장해야한다.
+//passport 요구
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
 
+//app.use() : express에 미들웨어설치
+app.use(passport.initialize());
+//passport는 내부적으로 세션사용할것
+app.use(passport.session());
+
+
+//세션 처리방법
+passport.serializeUser(function (user, done) {
+  //done(null, user.id);
+});
+
+passport.deserializeUser(function (id, done) {
+  /* User.findById(id, function (err, user) {
+    done(err, user);
+  }); */
+});
+
+//로그인시도할 때 성공하는 지 결정
 passport.use(new LocalStrategy(
   {
     usernameField: 'email',
@@ -61,6 +80,7 @@ passport.use(new LocalStrategy(
   }
 ));
 
+//사용자가 로그인했을 때 passport가 로그인 데이터를 처리하기 위한 코드
 app.post('/auth/login_process',
   passport.authenticate('local', {
     successRedirect: '/',
