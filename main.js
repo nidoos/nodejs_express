@@ -42,17 +42,22 @@ app.use(passport.session());
 
 
 //세션 처리방법
+//serializeUser : 로그인에 성공했을 때 딱 한번 호출되면서 사용자 식별자를 세션스토어에 저장
 passport.serializeUser(function (user, done) {
-  //done(null, user.id);
+  //serializeUser의 콜백함수가 호출되도록 약속되어짐
+  console.log('serializeUser', user);
+  done(null, user.email);
+  //done(null, 각각의 사용자를 식별할 수 있는 식별자)
 });
 
+//deserializeUser : 저장된 데이터를 기준으로 해서 필요한 데이터를 조회할 때 사용
 passport.deserializeUser(function (id, done) {
-  /* User.findById(id, function (err, user) {
-    done(err, user);
-  }); */
+  console.log('deserializeUser', id);
+  done(null, authData);
 });
 
-//로그인시도할 때 성공하는 지 결정
+//로컬전략을 쓰기위해 localstrategy 설치
+//로그인시도할 때 성공하는지 결정
 passport.use(new LocalStrategy(
   {
     usernameField: 'email',
