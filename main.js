@@ -20,7 +20,7 @@ app.use(compression());
 app.use(session({
   secret: 'keyboard cat',
   resave: false,
-  saveUninitialized: true,
+  saveUninitialized: false,
   store: new FileStore()
 }))
 
@@ -90,7 +90,8 @@ app.post('/auth/login_process',
   passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/auth/login'
-  }));
+  })
+);
 
 
 
