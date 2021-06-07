@@ -23,29 +23,16 @@ router.get('/login', (request, response) => {
     response.send(html);
 });
 
-/* router.post('/login_process', (request, response) => {
-    var post = request.body;
-    var email = post.email;
-    var password = post.pwd;
-    if (email === authData.email && password === authData.password) {
-        request.session.is_logined = true;
-        request.session.nickname = authData.nickname;
-
-        //세션객체에 있는 데이터를 세션스토어에 바로 반영. 반영작업이 끝나면 콜백함수 호출
-        request.session.save(function () {
-            response.redirect(`/`);
-        });
-
-    } else {
-        response.send('Who?');
-    }
-}); */
-
 router.get('/logout', (request, response) => {
+    //세션 로그아웃
+    request.logOut();
     //session_destroy
-    request.session.destroy(function (err) {
+    /*   request.session.destroy(function (err) {
+          response.redirect('/');
+      }); */
+    request.session.save(function () {
         response.redirect('/');
-    });
+    })
 });
 
 
