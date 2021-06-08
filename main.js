@@ -7,6 +7,7 @@ var compression = require('compression');
 var helmet = require('helmet');
 var session = require('express-session')
 var FileStore = require('session-file-store')(session)
+var flash = require('connect-flash');
 
 var indexRouter = require('./routes/index');
 var topicRouter = require('./routes/topic');
@@ -23,6 +24,21 @@ app.use(session({
   saveUninitialized: false,
   store: new FileStore()
 }))
+
+//flash는 세션을 내부적으로 쓰고있기 때문에 세션 다음에 이 미들웨어를 설치해야한다.
+app.use(flash());
+app.get('/flash', function (req, res) {
+  // flash메소드를 호출하면 세션스토어에 입력한 데이터를 추가하도록 되어있음.
+  req.flash('info', 'Flash is back!')
+  res.send('flash');
+});
+
+app.get('/flash-display', function (req, res) {
+  var fmsg = req.flash();
+  console.log(fmsg);
+  res.send(fmsg);
+  //res.render('index', { messages: req.flash('info') });
+});
 
 var authData = {
   email: '111@abc.com',
